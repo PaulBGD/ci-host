@@ -35,11 +35,11 @@ SocketServer.prototype.onConnection = function (socket) {
         } else {
             // he's sending the file!
             var buffer = data;
-            if (buffer.length != 0) {
+            if (buffer.length != 0 && !(buffer.length == 4 && buffer.toString('utf8') == 'done')) {
                 debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
                 buffers.push(buffer);
                 return;
-            } else if (buffer.toString('utf8') != 'done') {
+            } else if (buffer.length != 4 || buffer.toString('utf8') != 'done') {
                 debug('Received invalid data');
             }
             buffer = Buffer.concat(buffers);
