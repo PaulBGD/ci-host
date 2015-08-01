@@ -12,8 +12,10 @@ build:
     - master
   script:
     - 'zip -r ci-host.zip .'
-    - 'ci-deploy $CI_PROJECT_ID'
 
-ci-deploy:
-  files:
-    - 'ci-host.zip'
+deploy:
+  type: deploy
+  only:
+    - master
+  script:
+    - 'ci-deploy $CI_PROJECT_ID'
