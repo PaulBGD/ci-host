@@ -37,14 +37,14 @@ SocketServer.prototype.onConnection = function (socket) {
             var buffer = data;
             debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
             if (buffer.length != 0 && !(buffer.length == 4 && buffer.toString('utf8') == 'done')) {
-                buffers.push(buffer);
+                buffers.push(buffer.toString('utf8'));
                 return;
             } else if (buffer.length != 4 || buffer.toString('utf8') != 'done') {
                 debug('Received invalid data');
                 socket.end();
                 return;
             }
-            buffer = Buffer.concat(buffers);
+            buffer = new Buffer(buffers.join(''), 'base64');
             debug('Total buffer length: ' + buffer.length);
 
             // we've got the file, time to decrypt it
