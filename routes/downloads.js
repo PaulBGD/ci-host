@@ -13,14 +13,14 @@ router.get('/*/*', function (req, res, next) {
             err.status = 400;
             return next(err);
         }
-        if (req.session.ids.indexOf(project) === -1) {
-            err = new Error('Permission denied');
-            err.status = 400;
-            return next(err);
-        }
         var projectObj = projectManager.getProject(project);
         if (!projectObj) {
             err = new Error('Project does not exist');
+            err.status = 400;
+            return next(err);
+        }
+        if (req.session.ids.indexOf(project) === -1 && !projectObj.info.public) {
+            err = new Error('Permission denied');
             err.status = 400;
             return next(err);
         }
