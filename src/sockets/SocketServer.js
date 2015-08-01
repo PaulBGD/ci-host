@@ -17,7 +17,7 @@ SocketServer.prototype.onConnection = function (socket) {
     debug('Received socket connection..');
 
     var connected = false;
-    var projectId = -1;
+    var projectId = '';
     var extension = '';
     var buffers = [];
 
@@ -28,7 +28,7 @@ SocketServer.prototype.onConnection = function (socket) {
             } else {
                 socket.end();
             }
-        } else if (projectId == -1) {
+        } else if (projectId == '') {
             projectId = data.toString('utf8');
         } else if (extension == '') {
             extension = data.toString('utf8');
@@ -53,52 +53,51 @@ SocketServer.prototype.onConnection = function (socket) {
             cipher.setAutoPadding(false);
             buffer = cipher.update(buffer);
 
-            var project = projectManager.getProject(projectId);
-            if (project == null) {
-                // this is the first deploy
-                request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '?private_token=' + global.token, function (err, response, body) {
-                    if (err) {
-                        socket.end();
-                        return debug(err);
-                    } else if (response.statusCode !== 200) {
-                        socket.end();
-                        return debug('Invalid gitlab response', body);
-                    }
-                    var json = JSON.parse(body);
-                    var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
-                    if (!fs.existsSync(projectDir)) {
-                        fs.mkdirSync(projectDir);
-                    }
-                    var projectInfo = new JSONFile(path.join(projectDir, 'project.json'), {
-                        name: "unknown",
-                        url: 'http://unknown.com',
-                        id: -1,
-                        public: false,
-                        builds: []
-                    });
-                    var file = path.join(projectDir, json.name + '_1' + extension);
+            request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '?private_token=' + global.token, function (err, response, body) {
+                if (err) {
+                    socket.end();
+                    return debug(err);
+                } else if (response.statusCode !== 200) {
+                    socket.end();
+                    return debug('Invalid gitlab response', body);
+                }
+                var json = JSON.parse(body);
+                var project = projectManager.getProject(json.id);
+                if (project) {
+                    var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + extension);
                     fs.writeFileSync(file, buffer);
-
-                    projectInfo.name = json.name;
-                    projectInfo.url = json.web_url;
-                    projectInfo.id = json.id;
-                    projectInfo.public = json.public;
-                    projectInfo.builds = [{date: Date.now(), id: file}];
-                    projectInfo.write();
-
-                    var project = new Project(projectDir, projectInfo);
-                    projectManager.projects.push(project);
+                    project.info.builds.push({date: Date.now(), id: file});
+                    project.info.write();
                     debug('Saved as ' + file);
                     socket.end();
+                    return;
+                }
+                var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
+                if (!fs.existsSync(projectDir)) {
+                    fs.mkdirSync(projectDir);
+                }
+                var projectInfo = new JSONFile(path.join(projectDir, 'project.json'), {
+                    name: "unknown",
+                    url: 'http://unknown.com',
+                    id: -1,
+                    public: false,
+                    builds: []
                 });
-            } else {
-                var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + extension);
+                file = path.join(projectDir, json.name + '_1' + extension);
                 fs.writeFileSync(file, buffer);
-                project.info.builds.push({date: Date.now(), id: file});
-                project.info.write();
+
+                projectInfo.name = json.name;
+                projectInfo.url = json.web_url;
+                projectInfo.id = json.id;
+                projectInfo.public = json.public;
+                projectInfo.builds = [{date: Date.now(), id: file}];
+                projectInfo.write();
+
+                project = new Project(projectDir, projectInfo);
+                projectManager.projects.push(project);
                 debug('Saved as ' + file);
                 socket.end();
-            }
+            });
         }
     });
 
