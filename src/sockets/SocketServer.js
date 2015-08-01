@@ -39,9 +39,11 @@ SocketServer.prototype.onConnection = function (socket) {
                 debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
                 buffers.push(buffer);
                 return;
+            } else if (buffer.toString('utf8') != 'done') {
+                debug('Received invalid data');
             }
             buffer = Buffer.concat(buffers);
-            debug('Total buffer length: ' + buffer.length)
+            debug('Total buffer length: ' + buffer.length);
 
             // we've got the file, time to decrypt it
             var salt = config.server.key.substring(config.server.key.length / 2, config.server.key.length);
