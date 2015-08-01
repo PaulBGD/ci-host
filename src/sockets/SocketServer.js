@@ -55,7 +55,7 @@ SocketServer.prototype.onConnection = function (socket) {
             var project = projectManager.getProject(projectId);
             if (project == null) {
                 // this is the first deploy
-                request(config.gitlab.url + '/api/v3/projects/' + projectId + '?private_token=' + global.token, function (err, response, body) {
+                request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '?private_token=' + global.token, function (err, response, body) {
                     if (err) {
                         return debug(err);
                     } else if (response.statusCode !== 200) {
