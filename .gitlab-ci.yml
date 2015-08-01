@@ -1,6 +1,5 @@
 types:
   - build
-  - deploy
 
 build:
   type: build
@@ -8,14 +7,7 @@ build:
     - master
   script:
     - 'rm -f ci-host.zip'
-    - 'zip -r ci-host.zip . -x *.git*'
-    - 'ls'
-
-deploy:
-  type: deploy
-  only:
-    - master
-  script:
     - 'apt-get --yes install zip'
+    - 'zip -r ci-host.zip . -x *.git*'
     - 'ls'
     - 'ci-deploy $CI_PROJECT_ID'
