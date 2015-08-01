@@ -19,7 +19,6 @@ if (projects.length == 0) {
 %>
 <h1 class="page-header">Projects</h1>
 
-<div class="table-responsive">
     <table class="table table-striped">
         <thead>
         <tr>
@@ -34,13 +33,18 @@ if (projects.length == 0) {
         projects.forEach(function (project) {
             var info = project.info;
             var latest = project.getLatestBuild();
+            var id = latest.id.replace(/\\/g, '/').split('/').splice(2).join('/');
         %>
         <tr>
             <td><a href="<%= info.url %>"><%= info.name %></a></td>
             <td class="date"><%= new Date(latest.date).toUTCString() %></td>
             <td><%= info.builds.length %></td>
-            <td class="input-group">
-                <select class="download-select form-control input-sm" data-project="<%= info.id %>" autocomplete="off">
+            <td class="btn-group">
+                <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-sm btn-info download"><i class="fa fa-download"></i></a>
+                <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
                     <%
                         info.builds = info.builds.sort(function (o1, o2) {
                             if (o1.date > o2.date) {
@@ -51,21 +55,17 @@ if (projects.length == 0) {
                             return 0;
                         });
                     for (var i = 0; i < info.builds.length; i++) {
-                        var id = info.builds[i].id.replace(/\\/g, '/').split('/').splice(2).join('/');
+                        id = info.builds[i].id.replace(/\\/g, '/').split('/').splice(2).join('/');
                     %>
-                    <option value="<%= i %>"
-                            data-id="<%= id %>"
-                            <% if(i == info.builds.length - 1) { %>
-                            selected="selected"
-                            <% } %>
-                            >#<%= i + 1 %> <%= new Date(info.builds[i].date).toUTCString() %></option>
+                    <li>
+                        <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" value="<%= i %>" data-id="<%= id %>">
+                            #<%= i + 1 %> <%= new Date(info.builds[i].date).toUTCString() %>
+                        </a>
+                    </li>
                     <%
                     }
                     %>
-                </select>
-                <span class="input-group-btn"><a
-                            href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>"
-                            class="btn btn-sm btn-info download">Download</a></span>
+                </ul>
             </td>
         </tr>
         <%
@@ -73,7 +73,6 @@ if (projects.length == 0) {
         %>
         </tbody>
     </table>
-</div>
 <%
 }
 %>
