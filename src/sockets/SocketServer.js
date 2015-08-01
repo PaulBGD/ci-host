@@ -35,12 +35,13 @@ SocketServer.prototype.onConnection = function (socket) {
         } else {
             // he's sending the file!
             var buffer = data;
+            debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
             if (buffer.length != 0 && !(buffer.length == 4 && buffer.toString('utf8') == 'done')) {
-                debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
                 buffers.push(buffer);
                 return;
             } else if (buffer.length != 4 || buffer.toString('utf8') != 'done') {
                 debug('Received invalid data');
+                socket.end();
                 return;
             }
             buffer = Buffer.concat(buffers);
@@ -57,8 +58,10 @@ SocketServer.prototype.onConnection = function (socket) {
                 // this is the first deploy
                 request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '?private_token=' + global.token, function (err, response, body) {
                     if (err) {
+                        socket.end();
                         return debug(err);
                     } else if (response.statusCode !== 200) {
+                        socket.end();
                         return debug('Invalid gitlab response', body);
                     }
                     var json = JSON.parse(body);
@@ -86,6 +89,7 @@ SocketServer.prototype.onConnection = function (socket) {
                     var project = new Project(projectDir, projectInfo);
                     projectManager.projects.push(project);
                     debug('Saved as ' + file);
+                    socket.end();
                 });
             } else {
                 var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + extension);
@@ -93,6 +97,7 @@ SocketServer.prototype.onConnection = function (socket) {
                 project.info.builds.push({date: Date.now(), id: file});
                 project.info.write();
                 debug('Saved as ' + file);
+                socket.end();
             }
         }
     });
