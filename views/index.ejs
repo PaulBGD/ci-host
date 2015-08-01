@@ -37,10 +37,10 @@ if (projects.length == 0) {
         %>
         <tr>
             <td><a href="<%= info.url %>"><%= info.name %></a></td>
-            <td class="date"><%= new Date(latest.date).toUTCString() %></td>
+            <td><%= new Date(latest.date).toUTCString() %></td>
             <td><%= info.builds.length %></td>
             <td class="btn-group">
-                <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-sm btn-info download"><i class="fa fa-download"></i></a>
+                <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-sm btn-info"><i class="fa fa-download"></i></a>
                 <button type="button" class="btn btn-sm btn-info dropdown-toggle" data-toggle="dropdown">
                     <span class="caret"></span>
                 </button>
