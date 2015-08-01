@@ -5,6 +5,7 @@ Easily host artifacts from your Gitlab CI server.
 
 * Go to https://artifacts.paulb.gd to download a zip.
 * Extract the zip, and install the dependencies with `npm install`. Then start the server with `npm start`. Stop the server.
+* Go to the Admin Area in Gitlab, click Applications, and then click New Application. Name it whatever, however set the redirect URL path to `/auth/gitlab/callback`
 * On your Gitlab CI Runner server, install the deploy tool with `npm install -g ci-deploy`
 * In your .gitlab-ci.yml file, add the `ci-deploy` section like so:
 

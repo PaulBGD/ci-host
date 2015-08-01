@@ -8,7 +8,20 @@ var bodyParser = require('body-parser');
 var clientSessions = require('client-sessions');
 
 if (!fs.existsSync('config.json')) {
-    fs.writeFileSync('config.json', '{\n\n}');
+    fs.writeFileSync('config.json', JSON.stringify({
+        data: {
+            url: 'http://localhost:3000'
+        },
+        server: {
+            port: 8084,
+            key: 'unset',
+            gitlab: {
+                url: 'http://your-gitlab-instance.com',
+                app_id: 'unset',
+                secret: 'unset'
+            }
+        }
+    }));
 }
 
 global.projectManager = new (require('./src/ProjectManager'))();
