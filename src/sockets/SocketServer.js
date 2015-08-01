@@ -19,6 +19,7 @@ SocketServer.prototype.onConnection = function (socket) {
     var connected = false;
     var projectId = -1;
     var extension = '';
+    var buffers = [];
 
     socket.on('data', function (data) {
         if (!connected) {
@@ -34,10 +35,11 @@ SocketServer.prototype.onConnection = function (socket) {
         } else {
             // he's sending the file!
             var buffer = data;
-            if (buffer.length == 0) {
-                return console.error('Received invalid file');
+            if (buffer.length != 0) {
+                debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
+                buffers.push(buffer);
             }
-            debug('Received a file with length ' + buffer.length + ' for project ' + projectId);
+            buffer = Buffer.concat(buffers);
 
             // we've got the file, time to decrypt it
             var salt = config.server.key.substring(config.server.key.length / 2, config.server.key.length);
