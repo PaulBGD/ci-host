@@ -3,6 +3,9 @@ Easily host artifacts from your Gitlab CI server.
 
 [Github](https://github.com/PaulBGD/ci-host) [Gitlab](https://git.paulb.gd/PaulBGD/ci-host)
 
+## Requirements
+Both the ci-deploy and ci-host tools are built on Node.js. Find out how to download it [here](https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager).
+
 ## Installation
 
 * Go to https://artifacts.paulb.gd to download a zip.
