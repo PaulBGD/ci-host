@@ -10,4 +10,4 @@ build:
     - 'apt-get --yes install zip'
     - 'zip -r ci-host.zip . -x *.git*'
     - 'ls'
-    - 'ci-deploy $CI_PROJECT_ID'
+    - 'ci-deploy $CI_BUILD_REPO'

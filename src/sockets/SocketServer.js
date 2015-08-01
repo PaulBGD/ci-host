@@ -41,6 +41,7 @@ SocketServer.prototype.onConnection = function (socket) {
                 return;
             } else if (buffer.length != 4 || buffer.toString('utf8') != 'done') {
                 debug('Received invalid data');
+                return;
             }
             buffer = Buffer.concat(buffers);
             debug('Total buffer length: ' + buffer.length);

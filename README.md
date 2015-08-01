@@ -9,7 +9,7 @@ Easily host artifacts from your Gitlab CI server.
 * Fill out the data URL in the `config.json` file.
 * On your Gitlab CI Runner server, install the deploy tool with `npm install -g ci-deploy`.
 * Also on your Runner server, run `ci-deploy configure`. Copy this key, and put it as the server key in the `config.json`.
-* In your .gitlab-ci.yml file, add the `ci-deploy` section like so:
+* Create a .ci-deploy.yml file, add the `ci-deploy` section like so:
 
 ````yaml
 ci-deploy:
@@ -18,7 +18,7 @@ ci-deploy:
 ````
 Inside this section, you can supply a list of files to match and upload. Most glob patterns will work here.
 
-* Then inside your deploy script, add `ci-deploy $CI_PROJECT_ID`.
+* Then inside your deploy script, add `ci-deploy $CI_BUILD_REPO`.
 * Start back up the CI Host, and log in as a Gitlab Administrator.
 * You're done!
 
