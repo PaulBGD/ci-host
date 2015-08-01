@@ -56,7 +56,9 @@ SocketServer.prototype.onConnection = function (socket) {
                     }
                     var json = JSON.parse(body);
                     var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
-                    fs.mkdirSync(projectDir);
+                    if (!fs.existsSync(projectDir)) {
+                        fs.mkdirSync(projectDir);
+                    }
                     var projectInfo = new JSONFile(path.join(projectDir, 'project.json'), {
                         name: "unknown",
                         url: 'http://unknown.com',
