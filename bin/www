@@ -1,29 +1,17 @@
 #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-
-var app = require('../app');
 var debug = require('debug')('ci-host:server');
+
+debug('Creating app..');
+var app = require('../app');
 var http = require('http');
 
-/**
- * Get port from environment and store in Express.
- */
-
 var port = normalizePort(process.env.PORT || '3000');
+debug('Starting server on port', port);
 app.set('port', port);
 
-/**
- * Create HTTP server.
- */
-
+debug('Created server');
 var server = http.createServer(app);
-
-/**
- * Listen on provided port, on all network interfaces.
- */
 
 debug('Starting server..');
 server.listen(port);
