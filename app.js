@@ -1,3 +1,4 @@
+var fs = require('fs');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -5,6 +6,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var clientSessions = require('client-sessions');
+
+if (!fs.existsSync('config.json')) {
+    fs.writeFileSync('config.json', '{\n\n}');
+}
 
 global.projectManager = new (require('./src/ProjectManager'))();
 global.socketServer = new (require('./src/sockets/SocketServer'))();

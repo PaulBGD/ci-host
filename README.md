@@ -4,7 +4,7 @@ Easily host artifacts from your Gitlab CI server.
 ## Installation
 
 * Go to https://artifacts.paulb.gd to download a zip.
-* Extract the zip, and start the server with `npm start`. Stop the server.
+* Extract the zip, and install the dependencies with `npm install`. Then start the server with `npm start`. Stop the server.
 * On your Gitlab CI Runner server, install the deploy tool with `npm install -g ci-deploy`
 * In your .gitlab-ci.yml file, add the `ci-deploy` section like so:
 
