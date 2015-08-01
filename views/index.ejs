@@ -58,7 +58,7 @@ if (projects.length == 0) {
                         id = info.builds[i].id.replace(/\\/g, '/').split('/').splice(2).join('/');
                     %>
                     <li>
-                        <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" value="<%= i %>" data-id="<%= id %>">
+                        <a href="/downloads/<%= info.id %>/<%= i %>/<%= id %>" value="<%= i %>" data-id="<%= id %>">
                             #<%= i + 1 %> <%= new Date(info.builds[i].date).toUTCString() %>
                         </a>
                     </li>
