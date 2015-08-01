@@ -1,0 +1,19 @@
+types:
+  - build
+  - deploy
+
+before_script:
+  - 'rm -f ci-host.zip'
+  - 'apt-get --yes install zip'
+
+build:
+  type: build
+  only:
+    - master
+  script:
+    - 'zip -r ci-host.zip .'
+    - 'ci-deploy $CI_PROJECT_ID'
+
+ci-deploy:
+  files:
+    - 'ci-host.zip'
