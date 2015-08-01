@@ -29,7 +29,7 @@ SocketServer.prototype.onConnection = function (socket) {
                 socket.end();
             }
         } else if (projectId == -1) {
-            projectId = parseInt(data.toString('utf8'));
+            projectId = data.toString('utf8');
         } else if (extension == '') {
             extension = data.toString('utf8');
         } else {
@@ -38,8 +38,10 @@ SocketServer.prototype.onConnection = function (socket) {
             if (buffer.length != 0) {
                 debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
                 buffers.push(buffer);
+                return;
             }
             buffer = Buffer.concat(buffers);
+            debug('Total buffer length: ' + buffer.length)
 
             // we've got the file, time to decrypt it
             var salt = config.server.key.substring(config.server.key.length / 2, config.server.key.length);
