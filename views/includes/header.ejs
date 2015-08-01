@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html>
-<head>
+<head lang="en">
     <title>CI Host</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
     <link rel="stylesheet" href="/stylesheets/bootstrap.css">
     <link rel="stylesheet" href="/stylesheets/style.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
@@ -28,8 +30,7 @@
                     <%
                     if (logged_in) {
                     %>
-                    <a href="/auth/logout" data-toggle="tooltip" data-placement="bottom"
-                       title="Log Out">Hello <%= name %></a>
+                    <a href="/auth/logout" data-toggle="tooltip" data-placement="bottom" title="Log Out">Hello <%= name %></a>
                     <%
                     } else {
                     %>

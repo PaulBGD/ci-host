@@ -6,12 +6,9 @@
     box-sizing: border-box;
 }
 
-.table-responsive {
-    overflow: visible;
-    overflow-x: auto;
-    min-height: 100%;
-}
-
-.table-responsive > table {
-    height: 100%;
+.navbar-toggle {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    border: 0;
 }

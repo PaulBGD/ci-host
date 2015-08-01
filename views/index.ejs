@@ -23,7 +23,7 @@ if (projects.length == 0) {
         <thead>
         <tr>
             <th>Project</th>
-            <th>Date</th>
+            <th>Last Updated</th>
             <th>Builds</th>
             <th>Download</th>
         </tr>
@@ -37,7 +37,7 @@ if (projects.length == 0) {
         %>
         <tr>
             <td><a href="<%= info.url %>"><%= info.name %></a></td>
-            <td><%= new Date(latest.date).toUTCString() %></td>
+            <td class="time"><%= latest.date %></td>
             <td><%= info.builds.length %></td>
             <td class="btn-group">
                 <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-sm btn-info"><i class="fa fa-download"></i></a>
@@ -59,7 +59,7 @@ if (projects.length == 0) {
                     %>
                     <li>
                         <a href="/downloads/<%= info.id %>/<%= i %>/<%= id %>" value="<%= i %>" data-id="<%= id %>">
-                            #<%= i + 1 %> <%= new Date(info.builds[i].date).toUTCString() %>
+                            #<%= i + 1 %> <span class="time"><%= info.builds[i].date %></span>
                         </a>
                     </li>
                     <%
