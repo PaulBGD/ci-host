@@ -1,5 +1,7 @@
-# CI Host
+# CI Host [![build status](https://ci.paulb.gd/projects/2/status.png?ref=master)](https://ci.paulb.gd/projects/2?ref=master)
 Easily host artifacts from your Gitlab CI server.
+
+[Github](https://github.com/PaulBGD/ci-host) [Gitlab](https://git.paulb.gd/PaulBGD/ci-host)
 
 ## Installation
 
@@ -9,6 +11,7 @@ Easily host artifacts from your Gitlab CI server.
 * Fill out the data URL in the `config.json` file.
 * On your Gitlab CI Runner server, install the deploy tool with `npm install -g ci-deploy`.
 * Also on your Runner server, run `ci-deploy configure`. Copy this key, and put it as the server key in the `config.json`.
+* Last thing on your Runner server (if it's different than your web server), go to %USER%/config.json (the full path will be outputted by the above command) and set the IP of the server.
 * Create a .ci-deploy.yml file, add the `ci-deploy` section like so:
 
 ````yaml
