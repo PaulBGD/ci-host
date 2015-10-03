@@ -87,7 +87,8 @@ SocketServer.prototype.handleData = function (data) {
                 url: 'http://unknown.com',
                 id: -1,
                 public: false,
-                builds: []
+                builds: [],
+                readme: null
             }));
             projectManager.projects.push(project);
             return [project, file];

@@ -17,7 +17,8 @@ function ProjectManager() {
                     url: 'http://unknown.com',
                     id: -1,
                     public: false,
-                    builds: []
+                    builds: [],
+                    readme: null
                 });
                 projectInfo.read();
 
