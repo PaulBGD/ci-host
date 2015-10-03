@@ -1,6 +1,6 @@
 var fs = require('fs');
-var net = require('net');
 var path = require('path');
+var dgram = require('dgram');
 var debug = require('debug')('ci-host:Socket');
 var config = require('../../config.json');
 var crypto = require('crypto');
