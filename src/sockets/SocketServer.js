@@ -103,11 +103,11 @@ SocketServer.prototype.handleData = function (data) {
             project.info.builds.push({date: Date.now(), id: file});
             project.info.write(); // save our new data
             debug('Saved as ' + file);
-            console.log(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '/repository/files' +
+            console.log(config.gitlab.url + '/api/v3/projects/' + json.id + '/repository/files' +
                 '?private_token=' + global.token +
                 '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
                 '&ref=' + encodeURIComponent(projectRef));
-            return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '/repository/files' +
+            return request.getAsync(config.gitlab.url + '/api/v3/projects/' + json.id + '/repository/files' +
                 '?private_token=' + global.token +
                 '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
                 '&ref=' + encodeURIComponent(projectRef));
