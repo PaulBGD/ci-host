@@ -16,6 +16,7 @@ function SocketServer() {
 SocketServer.prototype.onConnection = function (socket) {
     debug('Received socket connection..');
 
+    var finishing = false;
     var connected = false;
     var projectId = '';
     var extension = '';
@@ -60,6 +61,10 @@ SocketServer.prototype.onConnection = function (socket) {
                 return;
             }
             socket.end();
+            if (finishing) {
+                return;
+            }
+            finishing = true;
             buffer = new Buffer(buffers.join(''), 'base64');
             debug('Total buffer length: ' + buffer.length);
 
