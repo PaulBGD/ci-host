@@ -92,6 +92,8 @@ SocketServer.prototype.handleData = function (data) {
             projectManager.projects.push(project);
             return [project, file];
         }).spread(function (project, file) {
+            var projectId = $this.projectId;
+            var projectRef = $this.projectRef;
             $this.resetData();
             // update data
             project.info.name = json.name;
@@ -101,14 +103,14 @@ SocketServer.prototype.handleData = function (data) {
             project.info.builds = project.info.builds || [];
             project.info.builds.push({date: Date.now(), id: file});
             debug('Saved as ' + file);
-            console.log(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
+            console.log(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '/repository/files' +
                 '?private_token=' + global.token +
                 '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
-                '&ref=' + encodeURIComponent($this.projectRef));
-            return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
+                '&ref=' + encodeURIComponent(projectRef));
+            return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '/repository/files' +
                 '?private_token=' + global.token +
                 '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
-                '&ref=' + encodeURIComponent($this.projectRef));
+                '&ref=' + encodeURIComponent(projectRef));
         }).spread(function (response, body) {
             if (response.statusCode !== 200) {
                 project.info.write(); // save our new data
