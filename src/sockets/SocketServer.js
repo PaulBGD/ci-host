@@ -59,6 +59,7 @@ SocketServer.prototype.onConnection = function (socket) {
                 socket.end();
                 return;
             }
+            socket.end();
             buffer = new Buffer(buffers.join(''), 'base64');
             debug('Total buffer length: ' + buffer.length);
 
@@ -70,10 +71,8 @@ SocketServer.prototype.onConnection = function (socket) {
 
             request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '?private_token=' + global.token, function (err, response, body) {
                 if (err) {
-                    socket.end();
                     return debug(err);
                 } else if (response.statusCode !== 200) {
-                    socket.end();
                     return debug('Invalid gitlab response', body);
                 }
                 var json = JSON.parse(body);
@@ -84,7 +83,6 @@ SocketServer.prototype.onConnection = function (socket) {
                     project.info.builds.push({date: Date.now(), id: file});
                     project.info.write();
                     debug('Saved as ' + file);
-                    socket.end();
                     return;
                 }
                 var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
@@ -111,7 +109,6 @@ SocketServer.prototype.onConnection = function (socket) {
                 project = new Project(projectDir, projectInfo);
                 projectManager.projects.push(project);
                 debug('Saved as ' + file);
-                socket.end();
             });
         }
     }
