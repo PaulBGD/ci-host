@@ -1,3 +1,4 @@
 ci-deploy:
   files:
     - 'ci-host.zip'
+  readme: 'README.md'

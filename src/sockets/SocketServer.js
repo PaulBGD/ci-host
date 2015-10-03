@@ -1,9 +1,12 @@
 var fs = require('fs');
 var path = require('path');
 var dgram = require('dgram');
+var yaml = require('js-yaml');
 var debug = require('debug')('ci-host:Socket');
 var config = require('../../config.json');
-var request = require('request');
+var Promise = require('bluebird');
+var markdown = require('markdown');
+var request = Promise.promisifyAll(require('request'));
 
 var Project = require('../Project');
 var JSONFile = require('../io/JSONFile');
@@ -15,6 +18,7 @@ function SocketServer() {
 SocketServer.prototype.resetData = function () {
     this.connected = false;
     this.projectId = '';
+    this.projectRef = '';
     this.extension = '';
     this.size = 0;
     this.buffers = [];
@@ -31,15 +35,19 @@ SocketServer.prototype.handleData = function (data) {
             this.connected = true;
         }
     } else if (this.projectId == '') {
-         str = data.toString();
+        str = data.toString();
         this.projectId = str;
         debug('Received projectId ' + this.projectId);
+    } else if (this.projectRef == '') {
+        str = data.toString();
+        this.projectRef = str;
+        debug('Received projectRef ' + this.projectRef);
     } else if (this.extension == '') {
-         str = data.toString();
+        str = data.toString();
         this.extension = str;
         debug('Received extension ' + this.extension);
     } else if (this.size == 0) {
-         str = data.toString();
+        str = data.toString();
         this.size = parseInt(str);
         debug('Received buffer amount ' + this.size);
     } else {
@@ -51,50 +59,81 @@ SocketServer.prototype.handleData = function (data) {
         }
         var buffer = Buffer.concat(this.buffers);
         var $this = this;
-        request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(this.projectId) + '?private_token=' + global.token, function (err, response, body) {
-            if (err) {
-                $this.resetData();
-                return debug(err);
-            } else if (response.statusCode !== 200) {
+        var json;
+        var project;
+        request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(this.projectId) + '?private_token=' + global.token).spread(function (response, body) {
+            if (response.statusCode !== 200) {
                 $this.resetData();
                 return debug('Invalid gitlab response', body);
             }
-            var json = JSON.parse(body);
-            var project = projectManager.getProject(json.id);
+            json = JSON.parse(body);
+            project = projectManager.getProject(json.id);
+
             if (project) {
                 var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + $this.extension);
                 fs.writeFileSync(file, buffer);
-                project.info.builds.push({date: Date.now(), id: file});
-                project.info.write();
                 debug('Saved as ' + file);
                 $this.resetData();
-                return;
+                return project;
             }
             var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
             if (!fs.existsSync(projectDir)) {
                 fs.mkdirSync(projectDir);
             }
-            var projectInfo = new JSONFile(path.join(projectDir, 'project.json'), {
+            file = path.join(projectDir, json.name + '_1' + $this.extension);
+            fs.writeFileSync(file, buffer);
+
+            project = new Project(projectDir, new JSONFile(path.join(projectDir, 'project.json'), {
                 name: "unknown",
                 url: 'http://unknown.com',
                 id: -1,
                 public: false,
                 builds: []
-            });
-            file = path.join(projectDir, json.name + '_1' + $this.extension);
-            fs.writeFileSync(file, buffer);
-
-            projectInfo.name = json.name;
-            projectInfo.url = json.web_url;
-            projectInfo.id = json.id;
-            projectInfo.public = json.public;
-            projectInfo.builds = [{date: Date.now(), id: file}];
-            projectInfo.write();
-
-            project = new Project(projectDir, projectInfo);
+            }));
             projectManager.projects.push(project);
             debug('Saved as ' + file);
+            return project;
+        }).then(function (project) {
             $this.resetData();
+            // update data
+            project.info.name = json.name;
+            project.info.url = json.web_url;
+            project.info.id = json.id;
+            project.info.public = json.public;
+            project.info.builds = project.info.builds || [];
+            project.info.builds.push({date: Date.now(), id: file});
+            return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
+                '?private_token=' + global.token +
+                '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
+                '&ref=' + encodeURIComponent($this.projectRef));
+        }).spread(function (response, body) {
+            if (response.statusCode !== 200) {
+                project.info.write(); // save our new data
+                $this.resetData();
+                return debug('Invalid gitlab response', body);
+            }
+            project.info.write(); // save our new data
+            var ciDeployRaw = JSON.parse(body).content;
+            var ciDeploy = new Buffer(ciDeployRaw, 'base64').toString('utf8');
+            var data = yaml.load(ciDeploy);
+            if (data['ci-deploy'] && data['ci-deploy'].readme) {
+                return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
+                    '?private_token=' + global.token +
+                    '&file_path=' + encodeURIComponent(data['ci-deploy'].readme) +
+                    '&ref=' + encodeURIComponent($this.projectRef))
+                    .spread(function (response, body) {
+                        if (response.statusCode !== 200) {
+                            return debug('Invalid gitlab response', body);
+                        }
+                        var readmeRaw = JSON.parse(body).content;
+                        var readme = new Buffer(readmeRaw, 'base64').toString('utf8');
+                        project.info.readme = markdown.toHTML(readme); // convert to html
+                        project.info.write();
+                    });
+            }
+        }).catch(function (err) {
+            $this.resetData();
+            debug(err);
         });
     }
 };

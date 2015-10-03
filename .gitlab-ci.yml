@@ -8,4 +8,4 @@ build:
   script:
     - 'rm -f ci-host.zip'
     - 'zip -r ci-host.zip . -x *.git*'
-    - 'ci-deploy $CI_BUILD_REPO'
+    - 'ci-deploy $CI_BUILD_REPO $CI_BUILD_REF'

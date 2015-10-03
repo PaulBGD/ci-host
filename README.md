@@ -21,10 +21,12 @@ Both the ci-deploy and ci-host tools are built on Node.js. Find out how to downl
 ci-deploy:
   files:
     - '*.json'
+  # If you want to add a README, simply add the file:
+  readme: 'README.md'
 ````
 Inside this section, you can supply a list of files to match and upload. Most glob patterns will work here.
 
-* Then inside your deploy script, add `ci-deploy $CI_BUILD_REPO`.
+* Then inside your deploy script, add `ci-deploy $CI_BUILD_REPO $CI_BUILD_REF`.
 * Start back up the CI Host, and log in as a Gitlab Administrator.
 * You're done!
 
