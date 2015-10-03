@@ -30,8 +30,10 @@ SocketServer.prototype.onConnection = function (socket) {
             }
         } else if (projectId == '') {
             projectId = data.toString('utf8');
+            debug('Received projectId ' + projectId);
         } else if (extension == '') {
             extension = data.toString('utf8');
+            debug('Received extension ' + extension);
         } else {
             // he's sending the file!
             var buffer = data;
