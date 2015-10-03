@@ -17,28 +17,40 @@ SocketServer.prototype.resetData = function () {
     this.connected = false;
     this.projectId = '';
     this.extension = '';
+    this.size = 0;
+    this.buffers = [];
     this.lastData = Date.now();
 };
 
 SocketServer.prototype.handleData = function (data) {
-    var str = data.toString();
     if (Date.now() - this.lastData > 10000) { // 10 second timeout
         this.resetData();
     }
     if (!this.connected) {
+        var str = data.toString();
         if (str == config.server.key.substring(0, config.server.key.length / 2)) {
             this.connected = true;
         }
     } else if (this.projectId == '') {
+         str = data.toString();
         this.projectId = str;
         debug('Received projectId ' + this.projectId);
     } else if (this.extension == '') {
+         str = data.toString();
         this.extension = str;
         debug('Received extension ' + this.extension);
+    } else if (this.size == 0) {
+         str = data.toString();
+        this.size = parseInt(str);
+        debug('Received buffer amount ' + this.size);
     } else {
         // he's sending the file!
-        var buffer = data;
-        debug('Received a buffer with length ' + buffer.length + ' for project ' + this.projectId);
+        this.buffers.push(data);
+        debug('Received a buffer with length ' + data.length + ' for project ' + this.projectId);
+        if (this.buffers.length < this.size) {
+            return;
+        }
+        var buffer = Buffer.concat(this.buffers);
 
         // we've got the file, time to decrypt it
         var salt = config.server.key.substring(config.server.key.length / 2, config.server.key.length);
