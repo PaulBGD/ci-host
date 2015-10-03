@@ -30,9 +30,10 @@ SocketServer.prototype.onConnection = function (socket) {
         var str = data.toString('utf8');
         var split = str.split('|');
         if (split.length > 1) {
-            for (var i = 1, max = split.length; i < max; i++) {
+            for (var i = 0, max = split.length; i < max; i++) {
                 handleData(new Buffer(split[i], 'utf8'));
             }
+            return;
         }
         if (!connected) {
             if (str == config.server.key.substring(0, config.server.key.length / 2)) {
