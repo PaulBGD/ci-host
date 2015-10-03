@@ -101,7 +101,7 @@ SocketServer.prototype.start = function () {
     server.on('listening', function () {
         debug('Listening on port', port);
     });
-    server.on('message', this.handleData);
+    server.on('message', this.handleData.bind(this));
     server.bind(port);
 };
 
