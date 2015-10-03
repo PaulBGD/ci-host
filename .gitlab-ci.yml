@@ -7,7 +7,6 @@ build:
     - master
   script:
     - 'rm -f ci-host.zip'
-    - 'apt-get --yes install zip'
     - 'zip -r ci-host.zip . -x *.git*'
     - 'ls'
     - 'ci-deploy $CI_BUILD_REPO'
