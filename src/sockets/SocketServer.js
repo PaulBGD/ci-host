@@ -126,6 +126,7 @@ SocketServer.prototype.handleData = function (data) {
                         var readmeRaw = JSON.parse(body).content;
                         var readme = new Buffer(readmeRaw, 'base64').toString('utf8');
                         project.info.readme = markdown.parse(readme); // convert to html
+                        debug('Wrote readme', project.info.readme);
                         project.info.write();
                     });
             }
