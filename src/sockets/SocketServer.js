@@ -57,6 +57,10 @@ SocketServer.prototype.handleData = function (data) {
         var cipher = crypto.createDecipher('aes-256-cbc', salt, salt);
         cipher.setAutoPadding(false);
         buffer = cipher.update(buffer);
+
+        // convert from base64
+        buffer = new Buffer(buffer, 'base64');
+
         var $this = this;
 
         request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(this.projectId) + '?private_token=' + global.token, function (err, response, body) {
