@@ -74,7 +74,7 @@ SocketServer.prototype.handleData = function (data) {
                 fs.writeFileSync(file, buffer);
                 debug('Saved as ' + file);
                 $this.resetData();
-                return project;
+                return [project, file];
             }
             var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
             if (!fs.existsSync(projectDir)) {
@@ -91,9 +91,8 @@ SocketServer.prototype.handleData = function (data) {
                 builds: []
             }));
             projectManager.projects.push(project);
-            debug('Saved as ' + file);
-            return project;
-        }).then(function (project) {
+            return [project, file];
+        }).spread(function (project, file) {
             $this.resetData();
             // update data
             project.info.name = json.name;
@@ -102,6 +101,7 @@ SocketServer.prototype.handleData = function (data) {
             project.info.public = json.public;
             project.info.builds = project.info.builds || [];
             project.info.builds.push({date: Date.now(), id: file});
+            debug('Saved as ' + file);
             return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
                 '?private_token=' + global.token +
                 '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
