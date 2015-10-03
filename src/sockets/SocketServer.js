@@ -91,7 +91,6 @@ SocketServer.prototype.handleData = function (data) {
             projectManager.projects.push(project);
             return [project, file];
         }).spread(function (project, file) {
-            var projectId = $this.projectId;
             var projectRef = $this.projectRef;
             $this.resetData();
             // update data
@@ -119,10 +118,10 @@ SocketServer.prototype.handleData = function (data) {
             var ciDeploy = new Buffer(ciDeployRaw, 'base64').toString('utf8');
             var data = yaml.load(ciDeploy);
             if (data['ci-deploy'] && data['ci-deploy'].readme) {
-                return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
+                return request.getAsync(config.gitlab.url + '/api/v3/projects/' + json.id + '/repository/files' +
                     '?private_token=' + global.token +
                     '&file_path=' + encodeURIComponent(data['ci-deploy'].readme) +
-                    '&ref=' + encodeURIComponent($this.projectRef))
+                    '&ref=' + encodeURIComponent(projectRef))
                     .spread(function (response, body) {
                         if (response.statusCode !== 200) {
                             return debug('Invalid gitlab response for retrieving ' + data['ci-deploy'].readme, body);
