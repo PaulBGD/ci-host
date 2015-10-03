@@ -110,7 +110,7 @@ SocketServer.prototype.handleData = function (data) {
             if (response.statusCode !== 200) {
                 project.info.write(); // save our new data
                 $this.resetData();
-                return debug('Invalid gitlab response', body);
+                return debug('Invalid gitlab response for retrieving .ci-deploy.yml', body);
             }
             project.info.write(); // save our new data
             var ciDeployRaw = JSON.parse(body).content;
@@ -123,7 +123,7 @@ SocketServer.prototype.handleData = function (data) {
                     '&ref=' + encodeURIComponent($this.projectRef))
                     .spread(function (response, body) {
                         if (response.statusCode !== 200) {
-                            return debug('Invalid gitlab response', body);
+                            return debug('Invalid gitlab response for retrieving ' + data['ci-deploy'].readme, body);
                         }
                         var readmeRaw = JSON.parse(body).content;
                         var readme = new Buffer(readmeRaw, 'base64').toString('utf8');
