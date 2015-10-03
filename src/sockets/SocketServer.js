@@ -72,7 +72,6 @@ SocketServer.prototype.handleData = function (data) {
             if (project) {
                 var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + $this.extension);
                 fs.writeFileSync(file, buffer);
-                $this.resetData();
                 return [project, file];
             }
             var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
@@ -102,6 +101,7 @@ SocketServer.prototype.handleData = function (data) {
             project.info.public = json.public;
             project.info.builds = project.info.builds || [];
             project.info.builds.push({date: Date.now(), id: file});
+            project.info.write(); // save our new data
             debug('Saved as ' + file);
             console.log(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '/repository/files' +
                 '?private_token=' + global.token +
@@ -113,11 +113,8 @@ SocketServer.prototype.handleData = function (data) {
                 '&ref=' + encodeURIComponent(projectRef));
         }).spread(function (response, body) {
             if (response.statusCode !== 200) {
-                project.info.write(); // save our new data
-                $this.resetData();
                 return debug('Invalid gitlab response for retrieving .ci-deploy.yml', body);
             }
-            project.info.write(); // save our new data
             var ciDeployRaw = JSON.parse(body).content;
             var ciDeploy = new Buffer(ciDeployRaw, 'base64').toString('utf8');
             var data = yaml.load(ciDeploy);
