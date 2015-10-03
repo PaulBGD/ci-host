@@ -72,7 +72,6 @@ SocketServer.prototype.handleData = function (data) {
             if (project) {
                 var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + $this.extension);
                 fs.writeFileSync(file, buffer);
-                debug('Saved as ' + file);
                 $this.resetData();
                 return [project, file];
             }
@@ -102,6 +101,10 @@ SocketServer.prototype.handleData = function (data) {
             project.info.builds = project.info.builds || [];
             project.info.builds.push({date: Date.now(), id: file});
             debug('Saved as ' + file);
+            console.log(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
+                '?private_token=' + global.token +
+                '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
+                '&ref=' + encodeURIComponent($this.projectRef));
             return request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent($this.projectId) + '/repository/files' +
                 '?private_token=' + global.token +
                 '&file_path=' + encodeURIComponent('.ci-deploy.yml') +
