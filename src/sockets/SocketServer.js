@@ -10,126 +10,99 @@ var Project = require('../Project');
 var JSONFile = require('../io/JSONFile');
 
 function SocketServer() {
-
+    this.resetData();
 }
 
-SocketServer.prototype.onConnection = function (socket) {
-    debug('Received socket connection..');
+SocketServer.prototype.resetData = function () {
+    this.connected = false;
+    this.projectId = '';
+    this.extension = '';
+    this.lastData = Date.now();
+};
 
-    var finishing = false;
-    var connected = false;
-    var projectId = '';
-    var extension = '';
-    var buffers = [];
-
-    socket.on('data', handleData);
-
-    function handleData(data) {
-        if (data.length == 0) {
-            return;
-        }
-        var str = data.toString('utf8');
-        var split = str.split('|');
-        if (split.length > 1) {
-            for (var i = 0, max = split.length; i < max; i++) {
-                handleData(new Buffer(split[i], 'utf8'));
-            }
-            return;
-        }
-        if (!connected) {
-            if (str == config.server.key.substring(0, config.server.key.length / 2)) {
-                connected = true;
-            } else {
-                socket.end();
-            }
-        } else if (projectId == '') {
-            projectId = str;
-            debug('Received projectId ' + projectId);
-        } else if (extension == '') {
-            extension = str;
-            debug('Received extension ' + extension);
-        } else {
-            // he's sending the file!
-            var buffer = data;
-            debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
-            if (buffer.length != 0 && !(buffer.length == 4 && str == 'done')) {
-                buffers.push(str);
-                return;
-            } else if (buffer.length != 4 || buffer.toString('utf8') != 'done') {
-                debug('Received invalid data');
-                socket.end();
-                return;
-            }
-            socket.end();
-            if (finishing) {
-                return;
-            }
-            finishing = true;
-            buffer = new Buffer(buffers.join(''), 'base64');
-            debug('Total buffer length: ' + buffer.length);
-
-            // we've got the file, time to decrypt it
-            var salt = config.server.key.substring(config.server.key.length / 2, config.server.key.length);
-            var cipher = crypto.createDecipher('aes-256-cbc', salt, salt);
-            cipher.setAutoPadding(false);
-            buffer = cipher.update(buffer);
-
-            request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(projectId) + '?private_token=' + global.token, function (err, response, body) {
-                if (err) {
-                    return debug(err);
-                } else if (response.statusCode !== 200) {
-                    return debug('Invalid gitlab response', body);
-                }
-                var json = JSON.parse(body);
-                var project = projectManager.getProject(json.id);
-                if (project) {
-                    var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + extension);
-                    fs.writeFileSync(file, buffer);
-                    project.info.builds.push({date: Date.now(), id: file});
-                    project.info.write();
-                    debug('Saved as ' + file);
-                    return;
-                }
-                var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
-                if (!fs.existsSync(projectDir)) {
-                    fs.mkdirSync(projectDir);
-                }
-                var projectInfo = new JSONFile(path.join(projectDir, 'project.json'), {
-                    name: "unknown",
-                    url: 'http://unknown.com',
-                    id: -1,
-                    public: false,
-                    builds: []
-                });
-                file = path.join(projectDir, json.name + '_1' + extension);
-                fs.writeFileSync(file, buffer);
-
-                projectInfo.name = json.name;
-                projectInfo.url = json.web_url;
-                projectInfo.id = json.id;
-                projectInfo.public = json.public;
-                projectInfo.builds = [{date: Date.now(), id: file}];
-                projectInfo.write();
-
-                project = new Project(projectDir, projectInfo);
-                projectManager.projects.push(project);
-                debug('Saved as ' + file);
-            });
-        }
+SocketServer.prototype.handleData = function (data) {
+    var str = data.toString();
+    if (Date.now() - this.lastData > 10000) { // 10 second timeout
+        this.resetData();
     }
+    if (!this.connected) {
+        if (str == config.server.key.substring(0, config.server.key.length / 2)) {
+            this.connected = true;
+        }
+    } else if (this.projectId == '') {
+        this.projectId = str;
+        debug('Received projectId ' + this.projectId);
+    } else if (this.extension == '') {
+        this.extension = str;
+        debug('Received extension ' + this.extension);
+    } else {
+        // he's sending the file!
+        var buffer = data;
+        debug('Received a buffer with length ' + buffer.length + ' for project ' + this.projectId);
 
-    socket.on('error', function (err) {
-        debug(err);
-        try {
-            socket.close();
-        } catch (e) {}
-    });
+        // we've got the file, time to decrypt it
+        var salt = config.server.key.substring(config.server.key.length / 2, config.server.key.length);
+        var cipher = crypto.createDecipher('aes-256-cbc', salt, salt);
+        cipher.setAutoPadding(false);
+        buffer = cipher.update(buffer);
+        var $this = this;
+
+        request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(this.projectId) + '?private_token=' + global.token, function (err, response, body) {
+            if (err) {
+                $this.resetData();
+                return debug(err);
+            } else if (response.statusCode !== 200) {
+                $this.resetData();
+                return debug('Invalid gitlab response', body);
+            }
+            var json = JSON.parse(body);
+            var project = projectManager.getProject(json.id);
+            if (project) {
+                var file = path.join(project.directory, project.info.name + '_' + (project.info.builds.length + 1) + $this.extension);
+                fs.writeFileSync(file, buffer);
+                project.info.builds.push({date: Date.now(), id: file});
+                project.info.write();
+                debug('Saved as ' + file);
+                $this.resetData();
+                return;
+            }
+            var projectDir = path.join('projects', json.path_with_namespace.replace(/\\/g, '-').replace(/\//g, '-'));
+            if (!fs.existsSync(projectDir)) {
+                fs.mkdirSync(projectDir);
+            }
+            var projectInfo = new JSONFile(path.join(projectDir, 'project.json'), {
+                name: "unknown",
+                url: 'http://unknown.com',
+                id: -1,
+                public: false,
+                builds: []
+            });
+            file = path.join(projectDir, json.name + '_1' + $this.extension);
+            fs.writeFileSync(file, buffer);
+
+            projectInfo.name = json.name;
+            projectInfo.url = json.web_url;
+            projectInfo.id = json.id;
+            projectInfo.public = json.public;
+            projectInfo.builds = [{date: Date.now(), id: file}];
+            projectInfo.write();
+
+            project = new Project(projectDir, projectInfo);
+            projectManager.projects.push(project);
+            debug('Saved as ' + file);
+            $this.resetData();
+        });
+    }
 };
 
 SocketServer.prototype.start = function () {
     var port = config.server.port;
-    net.createServer(this.onConnection).listen(port);
-    debug('Listening on port', port);
+    var server = dgram.createSocket('udp4');
+    server.on('listening', function () {
+        debug('Listening on port', port);
+    });
+    server.on('message', this.handleData);
+    server.bind(port);
 };
 
 module.exports = SocketServer;
