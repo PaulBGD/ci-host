@@ -61,6 +61,7 @@ SocketServer.prototype.handleData = function (data) {
         var $this = this;
         var json;
         var project;
+        var projectRef;
         request.getAsync(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(this.projectId) + '?private_token=' + global.token).spread(function (response, body) {
             if (response.statusCode !== 200) {
                 $this.resetData();
@@ -91,7 +92,7 @@ SocketServer.prototype.handleData = function (data) {
             projectManager.projects.push(project);
             return [project, file];
         }).spread(function (project, file) {
-            var projectRef = $this.projectRef;
+            projectRef = $this.projectRef;
             $this.resetData();
             // update data
             project.info.name = json.name;
