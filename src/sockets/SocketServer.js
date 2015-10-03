@@ -3,7 +3,6 @@ var path = require('path');
 var dgram = require('dgram');
 var debug = require('debug')('ci-host:Socket');
 var config = require('../../config.json');
-var crypto = require('crypto');
 var request = require('request');
 
 var Project = require('../Project');
@@ -28,7 +27,7 @@ SocketServer.prototype.handleData = function (data) {
     }
     if (!this.connected) {
         var str = data.toString();
-        if (str == config.server.key.substring(0, config.server.key.length / 2)) {
+        if (str == config.server.key) {
             this.connected = true;
         }
     } else if (this.projectId == '') {
@@ -51,18 +50,7 @@ SocketServer.prototype.handleData = function (data) {
             return;
         }
         var buffer = Buffer.concat(this.buffers);
-
-        // we've got the file, time to decrypt it
-        var salt = config.server.key.substring(config.server.key.length / 2, config.server.key.length);
-        var cipher = crypto.createDecipher('aes-256-cbc', salt, salt);
-        cipher.setAutoPadding(false);
-        buffer = cipher.update(buffer);
-
-        // convert from base64
-        buffer = new Buffer(buffer, 'base64');
-
         var $this = this;
-
         request(config.gitlab.url + '/api/v3/projects/' + encodeURIComponent(this.projectId) + '?private_token=' + global.token, function (err, response, body) {
             if (err) {
                 $this.resetData();
