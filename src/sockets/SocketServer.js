@@ -21,25 +21,37 @@ SocketServer.prototype.onConnection = function (socket) {
     var extension = '';
     var buffers = [];
 
-    socket.on('data', function (data) {
+    socket.on('data', handleData);
+
+    function handleData(data) {
+        if (data.length == 0) {
+            return;
+        }
+        var str = data.toString('utf8');
+        var split = str.split('|');
+        if (split.length > 1) {
+            for (var i = 1, max = split.length; i < max; i++) {
+                handleData(new Buffer(split[i], 'utf8'));
+            }
+        }
         if (!connected) {
-            if (data.toString('utf8') == config.server.key.substring(0, config.server.key.length / 2)) {
+            if (str == config.server.key.substring(0, config.server.key.length / 2)) {
                 connected = true;
             } else {
                 socket.end();
             }
         } else if (projectId == '') {
-            projectId = data.toString('utf8');
+            projectId = str;
             debug('Received projectId ' + projectId);
         } else if (extension == '') {
-            extension = data.toString('utf8');
+            extension = str;
             debug('Received extension ' + extension);
         } else {
             // he's sending the file!
             var buffer = data;
             debug('Received a buffer with length ' + buffer.length + ' for project ' + projectId);
-            if (buffer.length != 0 && !(buffer.length == 4 && buffer.toString('utf8') == 'done')) {
-                buffers.push(buffer.toString('utf8'));
+            if (buffer.length != 0 && !(buffer.length == 4 && str == 'done')) {
+                buffers.push(str);
                 return;
             } else if (buffer.length != 4 || buffer.toString('utf8') != 'done') {
                 debug('Received invalid data');
@@ -101,7 +113,7 @@ SocketServer.prototype.onConnection = function (socket) {
                 socket.end();
             });
         }
-    });
+    }
 
     socket.on('error', function (err) {
         debug(err);
