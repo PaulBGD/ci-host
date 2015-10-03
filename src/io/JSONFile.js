@@ -45,6 +45,7 @@ JSONFile.prototype.write = function() {
     }
     var data = JSON.stringify(json, null, 3);
     fs.writeFileSync(this._file, data);
+    debug('Wrote to ' + this._file, JSON.stringify(json));
 };
 
 module.exports = JSONFile;
