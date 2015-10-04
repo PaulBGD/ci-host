@@ -17,13 +17,13 @@ Both the ci-deploy and ci-host tools are built on Node.js. Find out how to downl
 * Last thing on your Runner server (if it's different than your web server), go to %USER%/config.json (the full path will be outputted by the above command) and set the IP of the server.
 * Create a .ci-deploy.yml file, add the `ci-deploy` section like so:
 
-````yaml
+```yaml
 ci-deploy:
   files:
     - '*.json'
   # If you want to add a README, simply add the file:
   readme: 'README.md'
-````
+```
 Inside this section, you can supply a list of files to match and upload. Most glob patterns will work here.
 
 * Then inside your deploy script, add `ci-deploy $CI_BUILD_REPO $CI_BUILD_REF`.
