@@ -6,6 +6,9 @@ var EMPTY_ARRAY = [];
 /* GET home page. */
 router.get('/:projectId', function (req, res, next) {
     var project = req.params.projectId;
+    if (typeof project == 'string') {
+        project = parseInt(project);
+    }
     if (isNaN(project)) {
         var err = new Error('Invalid parameters');
         err.status = 400;
