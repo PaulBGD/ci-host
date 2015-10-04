@@ -5,7 +5,8 @@ var yaml = require('js-yaml');
 var debug = require('debug')('ci-host:Socket');
 var config = require('../../config.json');
 var Promise = require('bluebird');
-var markdown = require('markdown');
+var showdown = require('showdown');
+var markdownConverter = new showdown.Converter({noHeaderId: true, simplifiedAutoLink: true});
 var request = Promise.promisifyAll(require('request'));
 
 var Project = require('../Project');
@@ -128,7 +129,7 @@ SocketServer.prototype.handleData = function (data) {
                         }
                         var readmeRaw = JSON.parse(body).content;
                         var readme = new Buffer(readmeRaw, 'base64').toString('utf8');
-                        project.info.readme = markdown.parse(readme); // convert to html
+                        project.info.readme = markdownConverter.makeHtml(readme); // convert to html
                         debug('Wrote readme', project.info.readme);
                         project.info.write();
                     });

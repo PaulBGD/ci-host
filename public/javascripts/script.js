@@ -21,13 +21,3 @@ $('[data-search]').each(function () {
         }
     });
 });
-
-$('code').each(function () {
-    var $this = $(this);
-    var split = $this.html().split('\n');
-    if (split.length > 1) {
-        var parent = $this.parent();
-        $this.remove();
-        parent.append($('<pre></pre>').html(split.slice(1).join('\n'))); // start at 1 because the first is the code type
-    }
-});
