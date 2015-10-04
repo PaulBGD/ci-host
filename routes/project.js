@@ -6,6 +6,9 @@ var EMPTY_ARRAY = [];
 /* GET home page. */
 router.get('/:projectId', function (req, res, next) {
     var project = req.params.projectId;
+    if (typeof project == 'string') {
+        project = parseInt(project);
+    }
     if (isNaN(project)) {
         var err = new Error('Invalid parameters');
         err.status = 400;
@@ -17,7 +20,7 @@ router.get('/:projectId', function (req, res, next) {
         err.status = 400;
         return next(err);
     }
-    if ((req.session.ids || EMPTY_ARRAY).indexOf(project) === -1 && !projectObj.info.public) {
+    if (!projectObj.info.public && (req.session.ids || EMPTY_ARRAY).indexOf(project) === -1) {
         err = new Error('Permission denied');
         err.status = 400;
         return next(err);

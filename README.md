@@ -1,4 +1,4 @@
-# CI Host [![build status](http://git.paulb.gd/ci/projects/1/status.png?ref=master)](http://git.paulb.gd/ci/projects/1?ref=master)
+# CI Host [![build status](https://git.paulb.gd/ci/projects/1/status.png?ref=master)](https://git.paulb.gd/ci/projects/1?ref=master)
 Easily host artifacts from your Gitlab CI server.
 
 [Github](https://github.com/PaulBGD/ci-host) [Gitlab](https://git.paulb.gd/PaulBGD/ci-host)

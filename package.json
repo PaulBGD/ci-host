@@ -19,6 +19,7 @@
     "morgan": "~1.6.1",
     "request": "^2.60.0",
     "serve-favicon": "~2.3.0",
+    "showdown": "^1.2.3",
     "simple-oauth2": "^0.2.1"
   }
 }

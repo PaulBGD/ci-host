@@ -10,6 +10,9 @@ The Gitlab token is not set up. Please have a Gitlab administrator log in to ver
 }
 %>
 <div class="row">
+    <%
+    if (project.info.readme) {
+    %>
     <div class="col-sm-9">
         <div class="list">
             <div class="readme">
@@ -17,7 +20,10 @@ The Gitlab token is not set up. Please have a Gitlab administrator log in to ver
             </div>
         </div>
     </div>
-    <div class="col-sm-3">
+    <%
+    }
+    %>
+    <div class="<%= project.info.readme ? "col-sm-3" : "col-sm-12" %>">
         <div class="list">
             <div class="readme">
                 <%

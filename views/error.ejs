@@ -3,8 +3,14 @@ var page = '';
 %>
 <%- include includes/header.ejs %>
 
-<h1 class="page-header"><i class="fa fa-exclamation-circle"></i> Error: <%= error.message %> (<%= error.status%>)</h1>
-<pre><%= error.stack %></pre>
+<h1 class="page-header"><i class="fa fa-exclamation-circle"></i> Error: <%= message %> (<%= status %>)</h1>
+<%
+if (stack.length > 0) {
+%>
+<pre><%= stack %></pre>
+<%
+}
+%>
 
 <a href="/" class="btn btn-default"><i class="fa fa-home"></i> Go Home</a>
 
