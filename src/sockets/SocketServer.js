@@ -88,7 +88,8 @@ SocketServer.prototype.handleData = function (data) {
                 id: -1,
                 public: false,
                 builds: [],
-                readme: null
+                readme: null,
+                icon: null
             }));
             projectManager.projects.push(project);
             return [project, file];
@@ -102,6 +103,7 @@ SocketServer.prototype.handleData = function (data) {
             project.info.public = json.public;
             project.info.builds = project.info.builds || [];
             project.info.builds.push({date: Date.now(), id: file});
+            project.info.icon = json.avatar_url;
             project.info.write(); // save our new data
             debug('Saved as ' + file);
             return request.getAsync(config.gitlab.url + '/api/v3/projects/' + json.id + '/repository/files' +

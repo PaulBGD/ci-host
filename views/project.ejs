@@ -1,0 +1,17 @@
+<%
+var page = 'project';
+%>
+<%- include includes/header.ejs %>
+<%
+if (!token) {
+%>
+The Gitlab token is not set up. Please have a Gitlab administrator log in to verify the application.
+<%
+}
+%>
+<div class="list">
+    <div class="readme">
+        <%- project.info.readme %>
+    </div>
+</div>
+<%- include includes/footer.ejs %>

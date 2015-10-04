@@ -1,3 +1,21 @@
+body {
+    background-color: #F1F4F8;
+    font-family: 'Source Sans Pro', sans-serif;
+}
+
+p, li, a {
+    font-weight: 400;
+    font-size: 15px;
+}
+
+p, li {
+    color: #444;
+}
+
+h1, h2, h3 {
+    font-weight: 500;
+}
+
 .container-fixed {
     width: 1000px;
     max-width: 100%;
@@ -11,4 +29,52 @@
     -moz-border-radius: 0;
     border-radius: 0;
     border: 0;
+}
+
+.list {
+    background-color: #fff;
+    border: 1px solid #E7E9ED;
+    margin-bottom: 50px;
+}
+
+.list > h3 {
+    margin: 15px;
+}
+
+.list > .filter {
+    border-top: 1px solid #E7E9ED;
+    border-bottom: 1px solid #E7E9ED;
+    background-color: #F8FAFC;
+    display: block;
+    padding: 10px;
+}
+
+.list > div.row {
+    margin: 10px 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #E7E9ED;
+}
+
+.list > div.row:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.list h4, .list h4 > a {
+    color: #4C4E54;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+.list h5 {
+    color: #7F8FA4;
+    font-size: 15px;
+}
+
+.list a.btn {
+    margin-top: 15px;
+}
+
+.list > .readme {
+    padding: 20px;
 }

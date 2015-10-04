@@ -18,7 +18,8 @@ function ProjectManager() {
                     id: -1,
                     public: false,
                     builds: [],
-                    readme: null
+                    readme: null,
+                    icon: false
                 });
                 projectInfo.read();
 

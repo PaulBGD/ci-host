@@ -31,6 +31,7 @@ global.token = require('./config.json').token;
 var routes = require('./routes/index');
 var auth = require('./routes/auth');
 var downloads = require('./routes/downloads');
+var project = require('./routes/project');
 
 var app = express();
 
@@ -56,6 +57,7 @@ app.use(clientSessions({
 app.use('/', routes);
 app.use('/auth', auth);
 app.use('/downloads', downloads);
+app.use('/project', project);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
