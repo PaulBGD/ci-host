@@ -21,3 +21,8 @@ $('[data-search]').each(function () {
         }
     });
 });
+
+$('#showAll').click(function() {
+    $('.btn.hidden').removeClass('hidden');
+    this.classList.add('hidden');
+});
