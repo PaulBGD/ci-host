@@ -74,8 +74,9 @@ if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
-            message: err.message,
-            error: err,
+            message: err.message || 'Unknown error',
+            status: err.status || 500,
+            stack: err.stack || '',
             logged_in: false
         });
     });
@@ -86,8 +87,9 @@ if (app.get('env') === 'development') {
 app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
-        message: err.message,
-        error: {},
+        message: err.message || 'Unknown error',
+        status: err.status || 500,
+        stack: '',
         logged_in: false
     });
 });
