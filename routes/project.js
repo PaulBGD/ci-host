@@ -17,8 +17,8 @@ router.get('/:projectId', function (req, res, next) {
         err.status = 400;
         return next(err);
     }
-    console.log(JSON.stringify(req.session));
-    if ((req.session.ids || EMPTY_ARRAY).indexOf(project) === -1 && !projectObj.info.public) {
+    console.log(JSON.stringify(req.session), (req.session.ids || EMPTY_ARRAY).indexOf(project));
+    if (!projectObj.info.public && (req.session.ids || EMPTY_ARRAY).indexOf(project) === -1) {
         err = new Error('Permission denied');
         err.status = 400;
         return next(err);
