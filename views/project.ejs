@@ -47,7 +47,7 @@ The Gitlab token is not set up. Please have a Gitlab administrator log in to ver
                     }
                     return 0;
                 });
-                for (var i = info.builds.length - 2; i > info.builds.length > 6 ? 0 : -1; i--) {
+                for (var i = info.builds.length - 2; i > 0; i--) {
                     id = info.builds[i].id.replace(/\\/g, '/').split('/').splice(2).join('/');
                 %>
                 <a href="/downloads/<%= info.id %>/<%= i %>/<%= id %>" class="btn btn-sm btn-default btn-block<%= info.builds.length > 6 && i < info.builds.length - 6 ? " hidden" : "" %>">
