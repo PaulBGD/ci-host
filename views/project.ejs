@@ -9,9 +9,49 @@ The Gitlab token is not set up. Please have a Gitlab administrator log in to ver
 <%
 }
 %>
-<div class="list">
-    <div class="readme">
-        <%- project.info.readme %>
+<div class="row">
+    <div class="col-sm-9">
+        <div class="list">
+            <div class="readme">
+                <%- project.info.readme %>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-3">
+        <div class="list">
+            <div class="readme">
+                <%
+                var info = project.info;
+                var latest = project.getLatestBuild();
+                var id = latest.id.replace(/\\/g, '/').split('/').splice(2).join('/');
+                %>
+                <h4>Download</h4>
+                <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-info btn-block"><i class="fa fa-download"></i> Latest</a>
+            </div>
+        </div>
+        <div class="list">
+            <div class="readme">
+                <h4>Previous</h4>
+                <%
+                info.builds = info.builds.sort(function (o1, o2) {
+                    if (o1.date > o2.date) {
+                        return 1;
+                    } else if (o2.date > o1.date) {
+                        return -1;
+                    }
+                    return 0;
+                });
+                for (var i = 0; i < info.builds.length; i++) {
+                    id = info.builds[i].id.replace(/\\/g, '/').split('/').splice(2).join('/');
+                %>
+                <a href="/downloads/<%= info.id %>/<%= i %>/<%= id %>" class="btn btn-sm btn-default btn-block">
+                    Build #<%= i + 1 %> - <span class="time"><%= info.builds[i].date %></span>
+                </a>
+                <%
+                }
+                %>
+            </div>
+        </div>
     </div>
 </div>
 <%- include includes/footer.ejs %>

@@ -34,7 +34,7 @@ h1, h2, h3 {
 .list {
     background-color: #fff;
     border: 1px solid #E7E9ED;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
 }
 
 .list > h3 {
@@ -77,4 +77,11 @@ h1, h2, h3 {
 
 .list > .readme {
     padding: 20px;
+}
+
+.list .icon {
+    float: left;
+    height: 60px;
+    padding: 5px;
+    margin-right: 20px;
 }

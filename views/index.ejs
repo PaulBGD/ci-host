@@ -2,23 +2,24 @@
 var page = 'home';
 %>
 <%- include includes/header.ejs %>
-<%
-if (!token) {
-%>
-The Gitlab token is not set up. Please have a Gitlab administrator log in to verify the application.
-<%
-}
-%>
-<%
-if (projects.length == 0) {
-%>
-<h1>No Projects Found</h1>
-<a href="/auth" class="btn btn-success">Relog</a>
-<%
-} else {
-%>
+
 <div class="list">
+    <%
+    if (!token) {
+    %>
+    The Gitlab token is not set up. Please have a Gitlab administrator log in to verify the application.
+    <%
+    }
+    %>
+    <%
+    if (projects.length == 0) {
+    %>
+    <h3>No Projects Found <a href="/auth" class="btn btn-info">Relog</a></h3>
+    <%
+    } else {
+    %>
     <h3 class="text-center">Projects</h3>
+
     <div class="filter">
         <input type="text" placeholder="Filter by name" class="form-control" data-search=".project">
     </div>
@@ -29,32 +30,30 @@ if (projects.length == 0) {
         var id = latest.id.replace(/\\/g, '/').split('/').splice(2).join('/');
     %>
     <div class="row project">
-        <div class="col-sm-1">
+        <div class="col-sm-10 col-xs-12">
             <%
             if (info.icon) {
-                %>
-            <img src="<%= info.icon %>" alt="Icon" class="img-responsive"/>
+            %>
+            <a href="/project/<%= info.id %>"><img src="<%= info.icon %>" alt="Icon" class="icon"/></a>
             <%
             }
-             %>
-        </div>
-        <div class="col-sm-9">
+            %>
             <h4><a href="/project/<%= info.id %>"><%= info.name %></a></h4>
             <h5>Last build <span class="time"><%= latest.date %></span></h5>
         </div>
-        <div class="col-sm-1 text-center" data-toggle="tooltip" data-placement="top" title="# of Builds">
+        <div class="col-sm-1 text-center hidden visible-sm visible-md visible-lg" data-toggle="tooltip" data-placement="top" title="# of Builds">
             <br>
             <i class="fa fa-archive"></i> <%= info.builds.length %>
         </div>
-        <div class="col-sm-1 text-center" data-toggle="tooltip" data-placement="top" title="Download Latest Build">
-            <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-sm btn-info"><i class="fa fa-download"></i></a>
+        <div class="col-sm-1 col-xs-12 text-center" data-toggle="tooltip" data-placement="top" title="Download Latest Build">
+            <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-sm btn-info btn-block"><i class="fa fa-download"></i></a>
         </div>
     </div>
     <%
     });
     %>
+    <%
+    }
+    %>
 </div>
-<%
-}
-%>
 <%- include includes/footer.ejs %>
