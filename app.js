@@ -1,4 +1,5 @@
 var fs = require('fs');
+var crypto = require('crypto');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -20,18 +21,22 @@ if (!fs.existsSync('config.json')) {
                 app_id: 'unset',
                 secret: 'unset'
             }
-        }
+        },
+        session_key: crypto.randomBytes(16).toString('hex')
     }));
 }
 
+var config = require('./config.json');
 global.projectManager = new (require('./src/ProjectManager'))();
+global.tokenManager = new (require('./src/TokenManager'))();
 global.socketServer = new (require('./src/sockets/SocketServer'))();
-global.token = require('./config.json').token;
+global.token = config.token;
 
 var routes = require('./routes/index');
 var auth = require('./routes/auth');
 var downloads = require('./routes/downloads');
 var project = require('./routes/project');
+var admin = require('./routes/admin');
 
 var app = express();
 
@@ -48,8 +53,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(clientSessions({
     cookieName: 'session',
-    // todo gen key
-    secret: 'adadaddg5redrajkdrtyab6353a525d253525234sdfmlsamflkfsm flkmsdlfmlsdfmldsfmlfksdmlkdfsmlfdsmddadhiljiojmkmladw12313ojdamdowajdnawjdioawjdoijm1m3o12i3j123io1j23oijmcaoicajdiowjaim4om4m2kwadwadwad644madw',
+    secret: config.session_key,
     duration: 30 * 24 * 60 * 60 * 1000,
     activeDuration: 1000 * 60 * 5
 }));
@@ -58,6 +62,7 @@ app.use('/', routes);
 app.use('/auth', auth);
 app.use('/downloads', downloads);
 app.use('/project', project);
+app.use('/admin', admin);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
@@ -77,7 +82,8 @@ if (app.get('env') === 'development') {
             message: err.message || 'Unknown error',
             status: err.status || 500,
             stack: err.stack || '',
-            logged_in: false
+            logged_in: false,
+            admin: req.session && req.session.admin
         });
     });
 }
@@ -90,7 +96,8 @@ app.use(function (err, req, res, next) {
         message: err.message || 'Unknown error',
         status: err.status || 500,
         stack: '',
-        logged_in: false
+        logged_in: false,
+        admin: req.session && req.session.admin
     });
 });
 

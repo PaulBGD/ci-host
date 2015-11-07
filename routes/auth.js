@@ -60,11 +60,12 @@ router.get('/gitlab/callback', function (req, res, next) {
             }
             var json = JSON.parse(body);
             var token = json.private_token;
-            if (json.is_admin && !global.token) {
-                global.token = token;
-                config.token = token;
-                fs.writeFileSync('config.json', JSON.stringify(config, null, 3));
-                console.log("wrote", JSON.stringify(config));
+            if (json.is_admin) {
+                if (!global.token) {
+                    global.token = token;
+                    config.token = token;
+                    fs.writeFileSync('config.json', JSON.stringify(config, null, 3));
+                }
             }
             req.session.token = token;
             if (!token) {
@@ -141,6 +142,7 @@ router.get('/gitlab/callback', function (req, res, next) {
                 req.session.name = json.name;
                 req.session.ids = ids || [];
                 req.session.logged_in = true;
+                req.session.admin = !!json.is_admin;
                 callback();
             });
         }

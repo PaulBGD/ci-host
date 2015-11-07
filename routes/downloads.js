@@ -19,7 +19,14 @@ router.get('/*/*', function (req, res, next) {
         err.status = 400;
         return next(err);
     }
-    if ((req.session.ids || EMPTY_ARRAY).indexOf(project) === -1 && !projectObj.info.public) {
+    var permitted = false;
+    if (req.query.auth_token) {
+        var token = tokenManager.getToken(req.query.auth_token);
+        permitted = token && token.belongsToProject(projectObj);
+    } else {
+        permitted = (req.session.ids || EMPTY_ARRAY).indexOf(project) === -1 && !projectObj.info.public;
+    }
+    if (!permitted) {
         err = new Error('Permission denied');
         err.status = 400;
         return next(err);

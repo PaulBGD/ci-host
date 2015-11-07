@@ -7,6 +7,7 @@ router.get('/', function (req, res) {
     if (projects.length > 0 || req.session.logged_in) {
         res.render('index', {
             name: req.session.name || '',
+            admin: !!req.session.admin,
             logged_in: !!req.session.logged_in,
             projects: projects,
             token: !!global.token

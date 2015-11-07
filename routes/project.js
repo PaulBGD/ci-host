@@ -20,16 +20,25 @@ router.get('/:projectId', function (req, res, next) {
         err.status = 400;
         return next(err);
     }
-    if (!projectObj.info.public && (req.session.ids || EMPTY_ARRAY).indexOf(project) === -1) {
+    var permitted = false;
+    if (req.query.auth_token) {
+        var token = tokenManager.getToken(req.query.auth_token);
+        permitted = token && token.belongsToProject(projectObj);
+    } else {
+        permitted = (req.session.ids || EMPTY_ARRAY).indexOf(project) !== -1 || projectObj.info.public;
+    }
+    if (!permitted) {
         err = new Error('Permission denied');
         err.status = 400;
         return next(err);
     }
     res.render('project', {
         name: req.session.name || '',
+        admin: !!req.session.admin,
         logged_in: !!req.session.logged_in,
         project: projectObj,
-        token: !!global.token
+        token: !!global.token,
+        auth: req.query.auth_token ? '?auth_token=' + req.query.auth_token : ''
     });
 });
 

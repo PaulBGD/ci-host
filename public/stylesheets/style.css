@@ -37,7 +37,7 @@ h1, h2, h3 {
     margin-bottom: 20px;
 }
 
-.list > h3 {
+.list > h3, .list > .content {
     margin: 15px;
 }
 
@@ -84,4 +84,9 @@ h1, h2, h3 {
     height: 60px;
     padding: 5px;
     margin-right: 20px;
+}
+
+.collapse-button {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

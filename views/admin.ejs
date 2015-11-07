@@ -1,0 +1,62 @@
+<%
+var page = 'admin';
+%>
+<%- include includes/header.ejs %>
+
+<div id="tokens" class="list">
+    <%
+    if (!token) {
+    %>
+    The Gitlab token is not set up. Please have a Gitlab administrator log in to verify the application.
+    <%
+    } else {
+    %>
+    <h3 class="text-center">Tokens</h3>
+
+    <div class="filter">
+        <button id="createToken" class="btn btn-success btn-block">Create New Token</button>
+    </div>
+    <div class="collapse row project" id="projectCollapse">
+        <div class="col-sm-3 text-center">
+            <button class="collapse-button btn btn-danger btn-block" data-toggle="collapse" data-target="#projectCollapse">Close <i class="fa fa-close"></i></button>
+        </div>
+        <%
+        projects.forEach(function (project) {
+            var info = project.info;
+        %>
+        <div class="col-sm-3">
+            <button class="collapse-button btn btn-info btn-block" data-project="<%= info.id %>"><%= info.name %></button>
+        </div>
+        <%
+        });
+        %>
+    </div>
+    <%
+    tokens.forEach(function (token) {
+    %>
+    <div class="row project">
+        <div class="col-sm-10">
+            <h4><%= token.token %></h4>
+            <h5 id="<%= token.token %>">Projects (<%= Object.keys(token.projects).length %>): <%= Object.keys(token.projects).join(', ') %></h5>
+        </div>
+        <div class="col-sm-2 btn-group-vertical btn-group-sm">
+            <button class="btn btn-info btn-block add" data-token="<%= token.token %>">Add or Remove</button>
+            <button class="btn btn-warning btn-block revoke" data-token="<%= token.token %>">Revoke</button>
+        </div>
+    </div>
+    <%
+    });
+    %>
+    <%
+    }
+    %>
+</div>
+
+<div class="list">
+    <h3>How to use (2 ways)</h3>
+    <div class="content">
+        <p>1. Copy the download link off of the download page for a project. Create a GET request to that URL with the parameter <code>auth_token</code> equal to your token.</p>
+        <p>2. Append <code>?auth_token=<%= '<token>' %></code> to a project page URL.</p>
+    </div>
+</div>
+<%- include includes/footer.ejs %>

@@ -32,7 +32,7 @@ The Gitlab token is not set up. Please have a Gitlab administrator log in to ver
                 var id = latest.id.replace(/\\/g, '/').split('/').splice(2).join('/');
                 %>
                 <h4>Download</h4>
-                <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id %>" class="btn btn-info btn-block"><i class="fa fa-download"></i> Latest</a>
+                <a href="/downloads/<%= info.id %>/<%= info.builds.length - 1 %>/<%= id + auth %>" class="btn btn-info btn-block"><i class="fa fa-download"></i> Latest</a>
             </div>
         </div>
         <div class="list">
@@ -50,7 +50,7 @@ The Gitlab token is not set up. Please have a Gitlab administrator log in to ver
                 for (var i = info.builds.length - 2; i > 0; i--) {
                     id = info.builds[i].id.replace(/\\/g, '/').split('/').splice(2).join('/');
                 %>
-                <a href="/downloads/<%= info.id %>/<%= i %>/<%= id %>" class="btn btn-sm btn-default btn-block<%= info.builds.length > 6 && i < info.builds.length - 6 ? " hidden" : "" %>">
+                <a href="/downloads/<%= info.id %>/<%= i %>/<%= id + auth %>" class="btn btn-sm btn-default btn-block<%= info.builds.length > 6 && i < info.builds.length - 6 ? " hidden" : "" %>">
                     Build #<%= i + 1 %> - <span class="time"><%= info.builds[i].date %></span>
                 </a>
                 <%
