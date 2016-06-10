@@ -1,3 +1,5 @@
+# This project should NOT be used as its features are now included in GitLab. This project should be considered deprecated.
+
 # CI Host [![build status](https://git.paulb.gd/ci/projects/1/status.png?ref=master)](https://git.paulb.gd/ci/projects/1?ref=master)
 Easily host artifacts from your Gitlab CI server.
 
